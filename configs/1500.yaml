@@ -1,0 +1,139 @@
+# general
+root: results/LLZO_la3d_Al20
+run_name: LLZO_la3d_Al20_1500
+seed: 123
+dataset_seed: 456
+append: true
+default_dtype: float32
+
+# -- network --
+model_builders:
+ - allegro.model.Allegro
+ # the typical model builders from `nequip` can still be used:
+ - PerSpeciesRescale
+ - ForceOutput
+ - RescaleEnergyEtc
+
+# cutoffs
+r_max: 7
+avg_num_neighbors: auto
+
+# radial basis
+BesselBasis_trainable: true
+PolynomialCutoff_p: 6   
+
+# symmetry
+l_max: 1
+parity: o3_full   
+
+# Allegro layers:
+num_layers: 4
+env_embed_multiplicity: 32
+embed_initial_edge: true
+
+two_body_latent_mlp_latent_dimensions: [32, 64, 128]
+two_body_latent_mlp_nonlinearity: silu
+two_body_latent_mlp_initialization: uniform
+
+latent_mlp_latent_dimensions: [128]
+latent_mlp_nonlinearity: silu
+latent_mlp_initialization: uniform
+latent_resnet: true
+
+env_embed_mlp_latent_dimensions: []
+env_embed_mlp_nonlinearity: null
+env_embed_mlp_initialization: uniform
+
+# - end allegro layers -
+
+# Final MLP to go from Allegro latent space to edge energies:
+edge_eng_mlp_latent_dimensions: [32]
+edge_eng_mlp_nonlinearity: null
+edge_eng_mlp_initialization: uniform
+
+# -- data --
+# alternatively, you can read directly from a VASP OUTCAR file (this will only read that single OUTCAR)
+# # for VASP OUTCAR, the yaml input should be
+dataset: ase
+dataset_file_name: ./OUTCAR
+ase_args:
+  format: vasp-out
+# important VASP note: the ase vasp parser stores the potential energy to "free_energy" instead of "energy".
+# Here, the key_mapping maps the external name (key) to the NequIP default name (value)
+key_mapping:
+  free_energy: total_energy
+
+# A mapping of chemical species to type indexes is necessary if the dataset is provided with atomic numbers instead of type indexes.
+chemical_symbols:
+  - Al
+  - La
+  - Li
+  - O
+  - Zr
+
+# logging
+wandb: true
+wandb_project: LLZO_la3d_Al20 
+verbose: info
+log_batch_freq: 1                                                                 # batch frequency, how often to print training errors withinin the same epoch
+log_epoch_freq: 1                                                                  # epoch frequency, how often to print 
+save_checkpoint_freq: -1                                                           # frequency to save the intermediate checkpoint. no saving of intermediate checkpoints when the value is not positive.
+save_ema_checkpoint_freq: -1 
+
+
+# training
+n_train: 1500
+n_val: 375
+batch_size: 3
+validation_batch_size: 20 
+max_epochs: 200
+learning_rate: 0.002
+train_val_split: random
+shuffle: true
+metrics_key: validation_loss
+
+# use an exponential moving average of the weights
+use_ema: true
+ema_decay: 0.99
+ema_use_num_updates: true
+
+# loss function
+loss_coeffs:
+  forces: 1.
+  total_energy:
+    - 1.
+    - PerAtomMSELoss
+
+# optimizer
+optimizer_name: Adam
+optimizer_params:
+  amsgrad: false
+  betas: !!python/tuple
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 0.
+
+metrics_components:
+  - - forces
+    - rmse
+  - - forces                                
+    - rmse                                  
+    - PerSpecies: True                   # if true, statistics on each component (i.e. fx, fy, fz) will be counted separately    
+      report_per_component: False      
+  - - total_energy
+    - rmse  
+  - - total_energy
+    - rmse
+    - PerAtom: True  
+
+# lr scheduler, drop lr if no improvement for 50 epochs
+lr_scheduler_name: ReduceLROnPlateau
+lr_scheduler_patience: 50
+lr_scheduler_factor: 0.5
+
+early_stopping_lower_bounds:
+  LR: 1.0e-5
+
+early_stopping_patiences:
+  validation_loss: 100
