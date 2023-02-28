@@ -159,11 +159,11 @@ n_train: 3500
 n_val: 875
 # batch size, we found it important to keep this small for most applications including forces (1-5); for energy-only training, higher batch sizes work better
 batch_size: 3
-validation_batch_size: 20
+validation_batch_size: 10
 # stop training after _ number of epochs, we set a very large number here, it won't take this long in practice and we will use early stopping instead
 max_epochs: 200
 # learning rate, we found values between 0.002 and 0.0005 to work best - this is often one of the most important hyperparameters to tune
-learning_rate: 0.002
+learning_rate: 0.005
 
 
 # can be random or sequential. if sequential, first n_train elements are training, next n_val are val, else random, usually random is the right choice
