@@ -27,7 +27,7 @@ l_max: 1
 parity: o3_full   
 
 # Allegro layers:
-num_layers: 4
+num_layers: 3
 env_embed_multiplicity: 32
 embed_initial_edge: true
 
@@ -85,9 +85,9 @@ save_ema_checkpoint_freq: -1
 n_train: 1500
 n_val: 375
 batch_size: 3
-validation_batch_size: 20 
+validation_batch_size: 5 
 max_epochs: 200
-learning_rate: 0.002
+learning_rate: 0.005
 train_val_split: random
 shuffle: true
 metrics_key: validation_loss
