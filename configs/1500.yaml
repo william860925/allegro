@@ -86,7 +86,7 @@ n_train: 1500
 n_val: 375
 batch_size: 3
 validation_batch_size: 5 
-max_epochs: 200
+max_epochs: 70
 learning_rate: 0.005
 train_val_split: random
 shuffle: true
@@ -136,4 +136,4 @@ early_stopping_lower_bounds:
   LR: 1.0e-5
 
 early_stopping_patiences:
-  validation_loss: 100
+  validation_loss: 50
