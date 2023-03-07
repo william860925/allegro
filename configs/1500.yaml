@@ -85,7 +85,7 @@ save_ema_checkpoint_freq: -1
 n_train: 1500
 n_val: 375
 batch_size: 3
-validation_batch_size: 5 
+validation_batch_size: 20
 max_epochs: 50
 learning_rate: 0.005
 train_val_split: random
