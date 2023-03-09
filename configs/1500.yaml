@@ -27,7 +27,7 @@ l_max: 1
 parity: o3_full   
 
 # Allegro layers:
-num_layers: 4
+num_layers: 6
 env_embed_multiplicity: 32
 embed_initial_edge: true
 
